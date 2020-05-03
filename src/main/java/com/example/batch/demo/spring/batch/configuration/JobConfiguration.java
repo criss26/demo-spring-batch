@@ -10,17 +10,12 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
-import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.database.JdbcPagingItemReader;
 import org.springframework.batch.item.database.Order;
 import org.springframework.batch.item.database.support.MySqlPagingQueryProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.example.batch.demo.spring.batch.Item.processor.TransactionItemProcessor;
 import com.example.batch.demo.spring.batch.entity.Transaction;
 import com.example.batch.demo.spring.batch.row.mapper.TransactionRowMapper;
 
@@ -81,29 +76,12 @@ public class JobConfiguration {
 		};
 	}
 	
-
-	@Bean
-	public TransactionItemProcessor processor() {
-		return new TransactionItemProcessor();
-	}
-
-	/*
-	@Bean
-	public JdbcBatchItemWriter<Transaction> transactionItemWriter(DataSource dataSource) {
-		return new JdbcBatchItemWriterBuilder<Transaction>()
-			.itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-			.sql("INSERT INTO transactions_processed (id, description) VALUES (:id, :description)")
-			.dataSource(dataSource)
-			.build();
-	}*/
 	
-
 	@Bean
 	public Step step1() {
 		return stepBuilderFactory.get("step1")
 				.<Transaction, Transaction>chunk(10)
 				.reader(pagingItemReader())
-				.processor(processor())
 				.writer(transactionItemWriter())
 				.build();
 	}
